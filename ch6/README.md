@@ -2,7 +2,7 @@
 
 ### Golang scheduler 原理
 
-![scheduler 原理](./images/ch6/scheduler.png)
+![scheduler 原理](/ch6/images/scheduler.png)
 
 如上图所示：
 
