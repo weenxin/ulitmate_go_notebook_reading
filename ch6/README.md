@@ -1,4 +1,57 @@
-### 并发基础
+## 第六章 并行
+
+### 6.1 Golang scheduler 原理
+
+![scheduler 原理](/ch6/images/scheduler.png)
+
+如上图所示：
+
+- 每个`M` 对应着一个计算机核心线程
+- 每个`P` 绑定一个 `M` ，基于自己的队列完成基于 `G` 的调度 
+- 每个`G` 是一个协程，类似于线程，但是更轻量级，这里这要理解，是`Golang` 应用程序调度的最小单位即可。
+
+#### go routine 状态 & context switching
+
+- Waiting : go routine处于此种状态下代表在等待某种资源，比如mutex等。
+- Runnable: 在此状态下的go routine具备执行状态，在等待golang sheduler 调度到M上绑定计算资源以运行代码逻辑。
+- Excuting: 此状态的goroutine处于正在执行状态，不需要等待任何资源，同时绑定了具体的计算资源，在运行代码逻辑。
+
+只有处于`Runnable`的`go-routine`才可以被调度到计算资源，进而执行系统逻辑。
+
+操作系统调度的最小单位是线程，golang context调度的最小粒度是go-routeine。golang 引用程序在执行过程中，会伴随着go-routine频繁抢占计算资源完成调度，调度过程中并不是无损的，需要设置各类寄存器，移动程序运行指针等。操作系统调度是基于Thread的，需要内核台和用户态的频繁切换，大概需要12K-18K的系统指令时间，Golang scheduler的调度是基于Golang的MGP模型的，只在用户态执行，因此效率会高很多，大概需要2.4K左右的系统指令时间。不管怎样，应该尽量避免频繁的`context swithing`，尤其在计算密集型应用；但是对于IO密集型应用这种`context switching`反而可以提高资源利用率。需要做好应用类型区分，合理利用golang scheduler的特性。
+
+
+`Golang` scheduler 做了如下优化：
+
+#### 网络IO多M复用
+
+![Net puller goroutine调度](/ch6/images/net_puller_scheduler.png)
+
+`G1` 调用网络IO 操作时会将其挂到`Net Puller`的`P`上，现有`P`可以调度其他`G`继续执行，避免CPU浪费，同时当`G1`网络IO结束后，自动会调度到活动的`P`上，完成指定工作；
+
+#### 同步System call
+
+![同步system call](/ch6/images/sync_system_call.png)
+
+`G2` 进行非`异步system call`时，会新建出一个新的`M2`，对应的P会绑定到`M2`上，`P`基于`M2`继续执行代码，当`G2`完成`system call`后，将其放入某个`P`的`LRQ`上；
+
+#### WorkStealing
+
+![golang scheduler work stealing](/ch6/images/work_stealing.png)
+
+当某个`P`的LRQ的所有goroutine都完成调度后，就开始从其他`P`中获取待完成的工作。
+
+
+#### 用户态调度
+
+![用户态调度](/ch6/images/user_scheduler.png)
+
+`Golang`的Scheduler是用户态的调度，所以没有内核态和用户态之间的频繁切换；所以基于`go routine`的调度，context switching的消耗小很多。操作系统context switching 需要消耗1000~1500ns 大概消耗12K-18K的系统指令执行时间；golang的调度时间只有200ns，消耗只有2.4K左右的系统指令；
+
+
+
+
+### 6.2 并发基础
 
 可以使用 ```runtime.GOMAXPROCS(1)``` 将设置golang 应用只使用一个操作系统线程。使用```g := runtime.GOMAXPROCS(0)```可以设置golang应用使用尽量多的操作系统线程，这对于`container`环境下有很大意义，因为可以对比返回的线程数量和容器环境下分配给应用的cpu线程数量是否相等，如果不相等需要做一定调整，以达到系统最佳运行效果。
 
@@ -63,7 +116,7 @@ A  3 Context Switches
 可以发现每次运行代码，结果都不一样，因此不能对逻辑做太多假设。
 
 
-### 6.4数据竟态
+### 6.4 数据竟态
 
 数据竟态主要发生在当多个cpu线程对同一片数据同时进行读写时，会导致数据竟态。对于数据竟态如果没有合理的同步机制，会导致代码逻辑异常。即使引入了同步机制后，也可能存在多个cpu同时访问同一片`cache line`，导致多个cpu对于`cache-line`的频繁同步，导致性能下降。
 
@@ -120,7 +173,7 @@ func main() {
 此时在运行代码，发现结果是2，并不是4，触发了代码中的"幻读"。
 
 
-### 数据竟态探测
+### 6.6 数据竟态探测
 
 如上所示的例子，数据竟态的问题探测是十分重要的，那么如何探测呢？
 
