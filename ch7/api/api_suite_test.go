@@ -17,7 +17,7 @@ import (
 	"github.com/onsi/ginkgo/v2"
 )
 
-var address = "0.0.0.0:8080"
+var address = "127.0.0.1:8080"
 var server *http.Server
 
 func TestApi(t *testing.T) {
