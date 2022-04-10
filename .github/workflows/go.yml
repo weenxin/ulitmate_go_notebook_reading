@@ -18,13 +18,20 @@ jobs:
       with:
         go-version: 1.18
         
-    - name: set up mysql
-      uses: mirromutth/mysql-action@v1.1
+    - uses: shogo82148/actions-setup-mysql@v1
       with:
-        mysql version: '5.7' # Optional, default value is "latest". The version of the MySQL
-        mysql root password: ${{ secrets.RootPassword }} # Required if "mysql user" is empty, default is empty. The root superuser password
-    - name: Start MySQL
-      run: sudo service mysql restart
+        distribution: 'mysql'
+        mysql-version: '5.7'
+        auto-start: true
+        root-password: ${{ secrets.RootPassword }}
+        
+#    - name: set up mysql
+#      uses: mirromutth/mysql-action@v1.1
+#      with:
+#        mysql version: '5.7' # Optional, default value is "latest". The version of the MySQL
+#        mysql root password: ${{ secrets.RootPassword }} # Required if "mysql user" is empty, default is empty. The root superuser password
+#    - name: Start MySQL
+#      run: sudo service mysql restart
     
     - name: Build
       run: go build -v ./...
