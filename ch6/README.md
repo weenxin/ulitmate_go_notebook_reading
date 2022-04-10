@@ -7,7 +7,7 @@
 如上图所示：
 
 - 每个`M` 对应着一个计算机核心线程
-- 每个`P` 绑定一个 `M` ，基于自己的队列完成基于 `G` 的调度 
+- 每个`P` 绑定一个 `M` ，基于自己的队列完成基于 `G` 的调度
 - 每个`G` 是一个协程，类似于线程，但是更轻量级，这里这要理解，是`Golang` 应用程序调度的最小单位即可。
 
 #### go routine 状态 & context switching
@@ -18,8 +18,10 @@
 
 只有处于`Runnable`的`go-routine`才可以被调度到计算资源，进而执行系统逻辑。
 
-操作系统调度的最小单位是线程，golang context调度的最小粒度是go-routeine。golang 引用程序在执行过程中，会伴随着go-routine频繁抢占计算资源完成调度，调度过程中并不是无损的，需要设置各类寄存器，移动程序运行指针等。操作系统调度是基于Thread的，需要内核台和用户态的频繁切换，大概需要12K-18K的系统指令时间，Golang scheduler的调度是基于Golang的MGP模型的，只在用户态执行，因此效率会高很多，大概需要2.4K左右的系统指令时间。不管怎样，应该尽量避免频繁的`context swithing`，尤其在计算密集型应用；但是对于IO密集型应用这种`context switching`反而可以提高资源利用率。需要做好应用类型区分，合理利用golang scheduler的特性。
-
+操作系统调度的最小单位是线程，golang context调度的最小粒度是go-routeine。golang
+引用程序在执行过程中，会伴随着go-routine频繁抢占计算资源完成调度，调度过程中并不是无损的，需要设置各类寄存器，移动程序运行指针等。操作系统调度是基于Thread的，需要内核台和用户态的频繁切换，大概需要12K-18K的系统指令时间，Golang
+scheduler的调度是基于Golang的MGP模型的，只在用户态执行，因此效率会高很多，大概需要2.4K左右的系统指令时间。不管怎样，应该尽量避免频繁的`context swithing`
+，尤其在计算密集型应用；但是对于IO密集型应用这种`context switching`反而可以提高资源利用率。需要做好应用类型区分，合理利用golang scheduler的特性。
 
 `Golang` scheduler 做了如下优化：
 
@@ -41,27 +43,23 @@
 
 当某个`P`的LRQ的所有goroutine都完成调度后，就开始从其他`P`中获取待完成的工作。
 
-
 #### 用户态调度
 
 ![用户态调度](/ch6/images/user_scheduler.png)
 
-`Golang`的Scheduler是用户态的调度，所以没有内核态和用户态之间的频繁切换；所以基于`go routine`的调度，context switching的消耗小很多。操作系统context switching 需要消耗1000~1500ns 大概消耗12K-18K的系统指令执行时间；golang的调度时间只有200ns，消耗只有2.4K左右的系统指令；
-
-
-
+`Golang`的Scheduler是用户态的调度，所以没有内核态和用户态之间的频繁切换；所以基于`go routine`的调度，context switching的消耗小很多。操作系统context switching 需要消耗1000~
+1500ns 大概消耗12K-18K的系统指令执行时间；golang的调度时间只有200ns，消耗只有2.4K左右的系统指令；
 
 ### 6.2 并发基础
 
-可以使用 ```runtime.GOMAXPROCS(1)``` 将设置golang 应用只使用一个操作系统线程。使用```g := runtime.GOMAXPROCS(0)```可以设置golang应用使用尽量多的操作系统线程，这对于`container`环境下有很大意义，因为可以对比返回的线程数量和容器环境下分配给应用的cpu线程数量是否相等，如果不相等需要做一定调整，以达到系统最佳运行效果。
-
+可以使用 ```runtime.GOMAXPROCS(1)``` 将设置golang 应用只使用一个操作系统线程。使用```g := runtime.GOMAXPROCS(0)```
+可以设置golang应用使用尽量多的操作系统线程，这对于`container`环境下有很大意义，因为可以对比返回的线程数量和容器环境下分配给应用的cpu线程数量是否相等，如果不相等需要做一定调整，以达到系统最佳运行效果。
 
 ### 6.3 抢占scheduler
 
 `Golang scheduler` 是基于抢占式的，所以在没有相关同步机制的情况下，不能对`go-routine`调度策略做任何的假设。比如：
 
-```go
-
+```
 func main() {
     var wg sync.WaitGroup
     wg.Add(2)
@@ -112,20 +110,18 @@ A  3 Context Switches
 
 ```
 
-
 可以发现每次运行代码，结果都不一样，因此不能对逻辑做太多假设。
-
 
 ### 6.4 数据竟态
 
-数据竟态主要发生在当多个cpu线程对同一片数据同时进行读写时，会导致数据竟态。对于数据竟态如果没有合理的同步机制，会导致代码逻辑异常。即使引入了同步机制后，也可能存在多个cpu同时访问同一片`cache line`，导致多个cpu对于`cache-line`的频繁同步，导致性能下降。
-
+数据竟态主要发生在当多个cpu线程对同一片数据同时进行读写时，会导致数据竟态。对于数据竟态如果没有合理的同步机制，会导致代码逻辑异常。即使引入了同步机制后，也可能存在多个cpu同时访问同一片`cache line`
+，导致多个cpu对于`cache-line`的频繁同步，导致性能下降。
 
 ### 6.5 数据竟态实例
 
 数据竟态问题是非常难以察觉和修复的。
 
-```go
+```
 var counter int
 func main() {
     const grs = 2
@@ -147,8 +143,8 @@ func main() {
 ```
 
 多次运行程序，结果都一样，couter结果都是4，但是并不代表代码逻辑是没有问题的。
-```go
 
+```
 var counter int
 func main() {
     const grs = 2
@@ -171,7 +167,6 @@ func main() {
 ```
 
 此时在运行代码，发现结果是2，并不是4，触发了代码中的"幻读"。
-
 
 ### 6.6 数据竟态探测
 
@@ -216,10 +211,10 @@ Found 1 data race(s)
 
 ### 6.7 atomics
 
-如上所示的例子如何修复呢 ？可以使用atomic(原子操作)，来解决。`atomics`的实现方式有很多种，很多实现都是基于硬件，比如CAS或者基于cache-line实现等。`atomics` 的优势在于`go-routine`处于自旋状态，不会发生`context switching`，这对于异常短暂的操作，可以有效提高计算资源利用效率。
+如上所示的例子如何修复呢 ？可以使用atomic(原子操作)，来解决。`atomics`的实现方式有很多种，很多实现都是基于硬件，比如CAS或者基于cache-line实现等。`atomics` 的优势在于`go-routine`
+处于自旋状态，不会发生`context switching`，这对于异常短暂的操作，可以有效提高计算资源利用效率。
 
-```go
-
+```
 var counter int32
 func main() {
     const grs = 2
@@ -238,11 +233,11 @@ func main() {
 }
 ```
 
-
 ### 6.8 Mutex
 
 如上所示的例子，还可以通过`mutex`来解决。
-```go
+
+```
 func main() {
   const grs = 2
   var wg sync.WaitGroup
@@ -273,31 +268,28 @@ golang对于mutex的实现做了优化，mutex有两种模式：
 - 正常模式，对于mutex加锁或进行自旋，当某个go-routine等待时间超过1M ns后，转换为饥饿模式
 - 饥饿模式，对于mutex加锁直接加入到队列尾端，即使是当前锁是空闲的，也需要排队
 
-
-
 ### 6.9 读写锁
 
 对于读多写少的情况，读写锁更适合。 读写锁原理为：
 
-- 加读锁，对于没有写锁的情况下，直接对于已有读计数增加1，
-  - 如果已经有写锁，读锁等待计数+1， 排队等待
-  - 如果有读锁等待，则读锁等待计数+1
-  - 如果没有写锁，直接正在读锁计数+1 
-  - 释放读锁时，如果没有正在执行的读锁，并且有写锁等待，则唤醒写锁
+- 加读锁，
+    - 如果已经有写锁，读锁等待计数+1， 排队等待
+    - 对于没有写锁的情况下，直接对于已有读计数增加1(自旋操作，不需要加锁)
+    - 释放读锁时，如果没有正在执行的读锁，并且有写锁等待，则唤醒写锁
 - 加写锁
-  - 如果已经有读锁，将读锁计数-maxlockcount，标示有写锁等待
-  - 如果有写锁，则等待
-  - 如果没有写锁则加锁成功
-  - 释放锁时，如果有读锁等待，则唤醒读锁
+    - 如果有写锁，则等待
+    - 如果已经有读锁，将读锁计数-maxlockcount，标示有写锁等待
+    - 没有写锁也没有读锁，则加锁成功
+    - 释放锁时，如果有读锁等待，则唤醒读锁
 
 ### 6.10 channel 语义
 
 [chan源码解读](/ch6/chan_source_code.md)
 
-
 应该理解chan为一种信息的同步机制，而不是一个数据结构。这样在使用chan的时候考虑更多的是发送/接收信号，而不是读取/写入信息。如果在使用chan的时候没有信号语义的话，应该考虑是否应该使用chan来解决问题。
 
 在使用chan时，一般需要考虑以下三个问题：
+
 - 是否需要确保信号一定被收到
 - 信号是否需要携带数据
 - chan的状态
@@ -306,10 +298,12 @@ golang对于mutex的实现做了优化，mutex有两种模式：
 
 如果需要在信号传输过程中携带数据，则需要感知，信号的传输是信号和接收者1对1的，所以如果想多个goroutine接收到信号，需要在发一个信号。但是如果不希望接收数据，则可以同时通知多个goroutine，这对于取消工作，关闭工作流程场景十分重要的。
 
-信号的状态有三种： 
+信号的状态有三种：
+
 - nil chan，对这类型的chan 发送和接收都会永久阻塞，关闭nil chan会panic
 - open状态，一个open的chan，对于没有缓存的chan，发送和接收者需要同时存在，才能建立信号发送接收的流程。对于buffer的chan，可以先发送，或者先接收。当chan空时，接收者会阻塞，当chan缓存满时，发送者会阻塞。
-- closed状态。使用`close(ch)`可以关闭chan，应该为了状态转换以关闭chan，而不是为了释放资源关闭chan（因为把chan当作信号机制用，而不是作为一个结构用）。给一个关闭的chan发送信号会导致`panic`，从一个关闭的chan接收信号会立刻收到一个`0状态`的信号。
+- closed状态。使用`close(ch)`可以关闭chan，应该为了状态转换以关闭chan，而不是为了释放资源关闭chan（因为把chan当作信号机制用，而不是作为一个结构用）。给一个关闭的chan发送信号会导致`panic`
+  ，从一个关闭的chan接收信号会立刻收到一个`0状态`的信号。
 
 ### 6.11 channel 模式
 
@@ -317,7 +311,7 @@ chan的主要用例模式为以下几种：
 
 #### 6.11.1 等待结果
 
-```go
+```
 func waitForResult() {
     ch := make(chan string)
     go func() { //开启子协程工作
@@ -333,10 +327,9 @@ func waitForResult() {
 }
 ```
 
-
 #### 6.11.2 扇入扇出
 
-```go
+```
 func fanOut() {
     children := 2000
     ch := make(chan string, children)
@@ -362,7 +355,7 @@ func fanOut() {
 
 #### 6.11.3 等待工作
 
-```go
+```
 func waitForTask() {
     ch := make(chan string)
     go func() { // 等待工作
@@ -377,10 +370,9 @@ func waitForTask() {
 }
 ```
 
-
 #### 6.11.4 运行池
 
-```go
+```
 func pooling() {
     ch := make(chan string)
     g := runtime.GOMAXPROCS(0) //获取使用最大的thread数量
@@ -410,7 +402,7 @@ func pooling() {
 
 #### 6.11.5 丢弃
 
-```go
+```
 
 func drop() {
     const cap = 100
@@ -440,7 +432,7 @@ func drop() {
 
 #### 6.11.6 取消
 
-```go
+```
 func cancellation() {
     duration := 150 * time.Millisecond
     ctx, cancel := context.WithTimeout(context.Background(), duration)
@@ -464,11 +456,9 @@ func cancellation() {
 }
 ```
 
-
-
 #### 6.11.7 信号限流
 
-```go
+```
 func fanOutSem() {
     children := 2000
     ch := make(chan string, children)
@@ -500,10 +490,9 @@ func fanOutSem() {
 }
 ```
 
-
 #### 6.11.8 有限工作池
 
-```go
+```
 func boundedWorkPooling() {
     work := []string{"paper", "paper", "paper", "paper", 2000: "paper"}
 
@@ -531,10 +520,9 @@ func boundedWorkPooling() {
 }
 ```
 
-
 #### 6.11.9 超时重试
 
-```go
+```
 func retryTimeout(ctx context.Context, retryInterval time.Duration, check func(ctx context.Context) error) {
 
     for {
@@ -566,10 +554,9 @@ func retryTimeout(ctx context.Context, retryInterval time.Duration, check func(c
 }
 ```
 
-
 #### 6.11.10 chan 结束context
 
-```go
+```
 func channelCancellation(stop <-chan struct{}) {
     ctx, cancel := context.WithCancel(context.Background())
     defer cancel()
