@@ -33,6 +33,8 @@ var _ = ginkgo.BeforeSuite(func() {
 
 	cmd := exec.Command("mysql", "-uroot", fmt.Sprintf("-p%s", rootPassoword))
 	cmd.Stdin = bytes.NewBuffer([]byte(`create database if not exists test; use test; CREATE TABLE IF NOT EXISTS books ( id INTEGER PRIMARY KEY AUTO_INCREMENT,     title varchar(255) NOT NULL,     author varchar(64) NOT NULL,     Pages int(10) not null,     weight int(10) not null );`))
+	cmd.Stderr = os.Stderr
+	cmd.Stdout = os.Stdout
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
@@ -71,6 +73,8 @@ var _ = ginkgo.AfterSuite(func() {
 	rootPassoword := os.Getenv("ROOT_DATABASE_PWD")
 	cmd := exec.Command("mysql", "-uroot", fmt.Sprintf("-p%s", rootPassoword))
 	cmd.Stdin = bytes.NewBuffer([]byte("drop database if exists test;"))
+	cmd.Stderr = os.Stderr
+	cmd.Stdout = os.Stdout
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 })
