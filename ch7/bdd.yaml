@@ -46,24 +46,30 @@ given:
   - name: "a dataset client"
     modules:
       - name: "save books to database"
-          behavior:
-            - when: "model with id = 0 "
-                - should: "return no error"
-                - should: "saved the model"
-                - should: "model id should not be zero"
+        behavior:
+          - when: "model with id = 0 "
+              - should: "return no error"
+              - should: "saved the model"
+              - should: "model id should not be zero"
       - name: "get books from database"
-          behavior:
-            - when: "model exists"
-                - should: "return no error"
-                - should: "return the model"
+        behavior:
+          - when: "model exists"
+              - should: "return no error"
+              - should: "return the model"
       - name: "delete books to database"
-          behavior:
-            - when: "model exits "
-                - should: "return no error"
-                - should: "delete the model"
+        behavior:
+          - when: "model exits "
+              - should: "return no error"
+              - should: "delete the model"
       - name: "update books to database"
-          behavior:
-            - when: "model exists "
-                - should: "return no error"
-                - should: "updated the model"
+        behavior:
+          - when: "model exists "
+              - should: "return no error"
+              - should: "updated the model"
+  - name: "Api"
+    modules:
+      - name: "normal use"
+        behavior:
+          - when: "smoking test"
+              - should: "success insert model & success get model"
 
