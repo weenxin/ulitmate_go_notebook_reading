@@ -1,0 +1,1 @@
+ go run ./ch7/cmd/main.go  --dsn='root:weenxin@tcp(127.0.0.1:3306)/test?charset=utf8mb4&parseTime=True&loc=Local'
