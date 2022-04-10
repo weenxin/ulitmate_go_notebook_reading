@@ -58,6 +58,8 @@ var _ = ginkgo.BeforeSuite(func() {
 		// service connections
 		server.ListenAndServe()
 	}()
+	//wait for server start
+	time.Sleep(1 * time.Second)
 
 })
 
