@@ -238,11 +238,12 @@ var _ = ginkgo.Describe("table testing", func() {
 				gomega.Expect(book.IsValid()).To(gomega.Equal(isValid))
 				gomega.Expect(book.FirstName()).To(gomega.Equal(firstName))
 				gomega.Expect(book.LastName()).To(gomega.Equal(lastName))
-			})
+			},
+			ginkgo.Entry("When author has both names", "Victor Hugo", true, "Victor", "Hugo"),
+			ginkgo.Entry("When author has one name", "Hugo", true, "", "Hugo"),
+			ginkgo.Entry("When author has a middle name", "Victor Marie Hugo", true, "Victor", "Hugo"),
+			ginkgo.Entry("When author has no name", "", false, "", ""),
+		)
 	},
-		ginkgo.Entry("When author has both names", "Victor Hugo", true, "Victor", "Hugo"),
-		ginkgo.Entry("When author has one name", "Hugo", true, "", "Hugo"),
-		ginkgo.Entry("When author has a middle name", "Victor Marie Hugo", true, "Victor", "Hugo"),
-		ginkgo.Entry("When author has no name", "", false, "", ""),
 	)
 })
