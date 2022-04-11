@@ -3,11 +3,8 @@ package e2e_test
 import (
 	"bytes"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
-	"github.com/weenxin/ulitmate_go_notebook_reading/ch7/api"
-	"github.com/weenxin/ulitmate_go_notebook_reading/ch7/service"
 	"os"
 	"os/exec"
 	"testing"
@@ -38,13 +35,8 @@ var _ = ginkgo.BeforeSuite(func() {
 	ginkgo.By("initializing database")
 	dsn := os.Getenv("DATABASE_DSN")
 	gomega.Expect(dsn).NotTo(gomega.BeEmpty())
-	err = service.InitManagerFromDsn(dsn)
-	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
 	ginkgo.By("start server")
-	r := gin.Default()
-	group := r.Group("/books")
-	api.InitRoute(group)
 
 	go func() {
 		server = exec.Command("./ch7-e2e-test", fmt.Sprintf("--dsn=%s", dsn), fmt.Sprintf("--address=%s", address))
@@ -53,6 +45,7 @@ var _ = ginkgo.BeforeSuite(func() {
 		defer ginkgo.GinkgoRecover()
 		err := server.Start()
 		if err != nil {
+			ginkgo.GinkgoWriter.Printf("start server faild err : %s, \n", err.Error())
 			ginkgo.Fail(fmt.Sprintf("start server failed :%s", err))
 		}
 
@@ -65,7 +58,7 @@ var _ = ginkgo.BeforeSuite(func() {
 var _ = ginkgo.AfterSuite(func() {
 	ginkgo.By("stop server")
 	if err := server.Process.Kill(); err != nil {
-		fmt.Println("Server Shutdown:", err)
+		ginkgo.GinkgoWriter.Printf("stop server faild err : %s\n", err.Error())
 	}
 
 	ginkgo.By("clear database")

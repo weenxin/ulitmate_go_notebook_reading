@@ -59,7 +59,7 @@ scheduler的调度是基于Golang的MGP模型的，只在用户态执行，因�
 
 `Golang scheduler` 是基于抢占式的，所以在没有相关同步机制的情况下，不能对`go-routine`调度策略做任何的假设。比如：
 
-```
+```go
 func main() {
     var wg sync.WaitGroup
     wg.Add(2)
@@ -121,7 +121,7 @@ A  3 Context Switches
 
 数据竟态问题是非常难以察觉和修复的。
 
-```
+```go
 var counter int
 func main() {
     const grs = 2
@@ -144,7 +144,7 @@ func main() {
 
 多次运行程序，结果都一样，couter结果都是4，但是并不代表代码逻辑是没有问题的。
 
-```
+```go
 var counter int
 func main() {
     const grs = 2
@@ -214,7 +214,7 @@ Found 1 data race(s)
 如上所示的例子如何修复呢 ？可以使用atomic(原子操作)，来解决。`atomics`的实现方式有很多种，很多实现都是基于硬件，比如CAS或者基于cache-line实现等。`atomics` 的优势在于`go-routine`
 处于自旋状态，不会发生`context switching`，这对于异常短暂的操作，可以有效提高计算资源利用效率。
 
-```
+```go
 var counter int32
 func main() {
     const grs = 2
@@ -237,7 +237,7 @@ func main() {
 
 如上所示的例子，还可以通过`mutex`来解决。
 
-```
+```go
 func main() {
   const grs = 2
   var wg sync.WaitGroup
@@ -311,7 +311,7 @@ chan的主要用例模式为以下几种：
 
 #### 6.11.1 等待结果
 
-```
+```go
 func waitForResult() {
     ch := make(chan string)
     go func() { //开启子协程工作
@@ -329,7 +329,7 @@ func waitForResult() {
 
 #### 6.11.2 扇入扇出
 
-```
+```go
 func fanOut() {
     children := 2000
     ch := make(chan string, children)
@@ -355,7 +355,7 @@ func fanOut() {
 
 #### 6.11.3 等待工作
 
-```
+```go
 func waitForTask() {
     ch := make(chan string)
     go func() { // 等待工作
@@ -372,7 +372,7 @@ func waitForTask() {
 
 #### 6.11.4 运行池
 
-```
+```go
 func pooling() {
     ch := make(chan string)
     g := runtime.GOMAXPROCS(0) //获取使用最大的thread数量
@@ -402,8 +402,7 @@ func pooling() {
 
 #### 6.11.5 丢弃
 
-```
-
+```go
 func drop() {
     const cap = 100
     ch := make(chan string, cap)
@@ -432,7 +431,7 @@ func drop() {
 
 #### 6.11.6 取消
 
-```
+```go
 func cancellation() {
     duration := 150 * time.Millisecond
     ctx, cancel := context.WithTimeout(context.Background(), duration)
@@ -458,7 +457,7 @@ func cancellation() {
 
 #### 6.11.7 信号限流
 
-```
+```go
 func fanOutSem() {
     children := 2000
     ch := make(chan string, children)
@@ -492,7 +491,7 @@ func fanOutSem() {
 
 #### 6.11.8 有限工作池
 
-```
+```go
 func boundedWorkPooling() {
     work := []string{"paper", "paper", "paper", "paper", 2000: "paper"}
 
@@ -522,7 +521,7 @@ func boundedWorkPooling() {
 
 #### 6.11.9 超时重试
 
-```
+```go
 func retryTimeout(ctx context.Context, retryInterval time.Duration, check func(ctx context.Context) error) {
 
     for {
@@ -556,7 +555,7 @@ func retryTimeout(ctx context.Context, retryInterval time.Duration, check func(c
 
 #### 6.11.10 chan 结束context
 
-```
+```go
 func channelCancellation(stop <-chan struct{}) {
     ctx, cancel := context.WithCancel(context.Background())
     defer cancel()
