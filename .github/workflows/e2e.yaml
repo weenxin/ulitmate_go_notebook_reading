@@ -1,4 +1,4 @@
-name: Go
+name: e2e test
 
 on:
   push:
