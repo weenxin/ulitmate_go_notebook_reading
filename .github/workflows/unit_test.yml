@@ -18,14 +18,6 @@ jobs:
         with:
           go-version: 1.18
 
-      - uses: shogo82148/actions-setup-mysql@v1
-        with:
-          distribution: 'mysql'
-          mysql-version: '5.7'
-          auto-start: true
-          root-password: ${{ secrets.RootPassword }}
-
-
       - name: Build
         run: go build -v ./...
 
