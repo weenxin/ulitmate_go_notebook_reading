@@ -1,6 +1,7 @@
 package model_test
 
 import (
+	"fmt"
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
 	"os"
@@ -245,5 +246,20 @@ var _ = ginkgo.Describe("table testing", func() {
 			ginkgo.Entry("When author has no name", "", false, "", ""),
 		)
 	},
+	)
+})
+
+var _ = ginkgo.Describe("Math", func() {
+	ginkgo.DescribeTable("addition",
+		func(a, b, c int) {
+			gomega.Expect(a + b).To(gomega.Equal(c))
+		},
+		func(a, b, c int) string {
+			return fmt.Sprintf("%d + %d = %d", a, b, c)
+		},
+		ginkgo.Entry(nil, 1, 2, 3),
+		ginkgo.Entry(nil, -1, 2, 1),
+		ginkgo.Entry(nil, 0, 0, 0),
+		ginkgo.Entry(nil, 10, 100, 110),
 	)
 })
