@@ -1,18 +1,18 @@
-## Ginkgo BDD测试
+# Ginkgo BDD测试
 
-### 什么是BDD
+## 什么是BDD
 
 BDD（Behavior driven development） 行为驱动测试，是对TDD（Test driven
 development）的改进，BDD可以让开发聚焦在模型的行为上，有点像DDD聚焦在领域模型设计。软件开发的意义是生产有价值的产品，产品的特性是迭代的，用户需求也是变化的。所以如果程序模型的设计不能与产品模型，现实模型相对应，并跟随产品模型迭代，程序模型不断重构；非常容易形成所谓的"
 屎山"。
 
-### 如何开始BDD
+## 如何开始BDD
 
 - 制定模型行为规范
 - 书写Given，When，Then 用例
 - 按照规范开始写测试，写代码
 
-### 规范
+## 规范
 
 ```yaml
 given:
@@ -93,7 +93,7 @@ var _ = ginkgo.Describe("Book", func() {
 }
 ```
 
-### GinkGo基本使用
+## GinkGo基本使用
 
 [官方文档](https://onsi.github.io/ginkgo/)
 
@@ -124,7 +124,7 @@ Generating ginkgo test for Book in:
 
 ***写单元测试***
 
-### Ginkgo 原理
+## Ginkgo 原理
 
 - `Describe` ， `Context` , `When` 是语义等同的，称他们为构造语义，用来构造逻辑树，称这些节点为容器节点;
 - `It` 是执行语义，称这些节点为运行节点；
@@ -240,7 +240,7 @@ var _ = It("has a color", func() {
 })
 ```
 
-#### 不要在容器节点中做任何Assert
+### 不要在容器节点中做任何Assert
 
 因为容器节点内的代码只在测试树建立过程中运行，此时还没有运行真正的测试用例。
 
@@ -256,7 +256,7 @@ var _ = Describe("book", func() {
 })
 ```
 
-#### 为了避免测试用例污染：不要在容器节点中初始化变量
+### 为了避免测试用例污染：不要在容器节点中初始化变量
 
 ```go
 /* === INVALID === */
@@ -303,7 +303,7 @@ var _ = Describe("book", func() {
 })
 ```
 
-#### JustBeforeEach 分离配置与对象创建
+### JustBeforeEach 分离配置与对象创建
 
 `JustBeforeEach`的语句的运行顺序
 
@@ -396,7 +396,7 @@ Describe("some JSON decoding edge cases", func() {
 })
 ```
 
-#### AfterEach DeferCleanup 清理测试环境
+### AfterEach DeferCleanup 清理测试环境
 
 如下所示的代码：
 
@@ -496,7 +496,7 @@ Describe("Reporting book weight", func() {
 
 可以将清理代码，使用`DeferCleanup`整理到`BeforeEach`中。`DeferCleanup`不被ginkgo认为是运行节点，所以不会之前的实践有冲突。
 
-#### BeforeSuite , AfterSuite suite前的清理和创建
+### BeforeSuite , AfterSuite suite前的清理和创建
 
 `BeforeSuite`和`AfterSuite`一般用在测试前的环境搭建合清理。比如project依赖与mysql，运行测试用例前应该先搭建mysql。
 
@@ -635,7 +635,7 @@ var _ = ginkgo.Describe("Api", func() { //测试对外API
 })
 ```
 
-#### Ginkgo如何处理错误
+### Ginkgo如何处理错误
 
 - 用户可以使用`gomega`的`expect`来指定返回结果应该与期望一直，当然用户也可以直接调用`ginkgo.Fail`来直接结束用例；
 - 在`BeforeEach`, `JustBeforeEach`, `It` 这些运行节点中调用失败函数时，会终止本用例的执行，如果期望只要有一个用例失败就停止所有，可以启用`ginkgo --fail-fast`这个flag
@@ -653,7 +653,7 @@ It("panics in a goroutine", func() {
 })
 ```
 
-#### 日志输出
+### 日志输出
 
 当有部分重要信息debug信息需要输出时，可以使用ginkgo的输出函数，默认情况下只有当测试用例失败时这些信息才会输出到stdout中，可以使用`ginkgo -v`将所有错误信息都输出。
 
@@ -661,7 +661,7 @@ It("panics in a goroutine", func() {
 - ginkgo.GinkgoWriter.Println(a ...interface{})
 - ginkgo.GinkgoWriter.Printf(format string, a ...interface{})
 
-#### 通过By来书写复杂用例文档
+### 通过By来书写复杂用例文档
 
 ```go
 var _ = Describe("Browsing the library", func() {
@@ -702,7 +702,7 @@ var _ = Describe("Browsing the library", func() {
 如上所示的用例，如果有错误出现，会按照by出现的顺序依次输出，更容易定位问题出现在哪个环节。
 
 
-#### TableTesting
+### TableTesting
 
 TableTesting已经被很多项目所采用，ginkgo也支持Table Specs的。
 
@@ -838,12 +838,12 @@ ar _ = Describe("Math", func() {
 ```
 
 
-### Ginkgo 运行测试用例
+## Ginkgo 运行测试用例
 
 - Ginkgo假设所有测试用例之间都是独立的
 - Ginkgo在运行测试前会对测试用例运行顺序随机处理；
 
-#### 并行运行测试用例
+### 并行运行测试用例
 
 可以通过`-p`参数指定测试用例并行数量；如`ginkgo -procs=N`使用方式。如下所示的代码：
 
@@ -925,7 +925,7 @@ totalProcesses := suiteConfig.ParallelTotal
 ```
 
 
-#### SynchronizedBeforeSuite 和 SynchronizedAfterSuite
+### SynchronizedBeforeSuite 和 SynchronizedAfterSuite
 为了支持并行：
 - `BeforeSuite`前会运行`SynchronizedBeforeSuite`
 - `AfterSuite`之后运行`SynchronizedAfterSuite`
@@ -974,14 +974,14 @@ Describe("checking out a book", Ordered, func() {
 ```
 
 
-#### `BeforeAll`和`AfterAll`
+### `BeforeAll`和`AfterAll`
 
 `BeforeAll`和`AfterAll`可以在`Ordered`中使用。
 - `BeforeAll`保证在所有用例前指定一次；
 - `AfterAll`保证在所有用例后执行一次；
 
 
-#### 筛选用例
+### 筛选用例
 
 - Pending 不会运行的用例
 - Skip 会跳过用例
@@ -1007,7 +1007,7 @@ FDescribe("some specs you're debugging", func() {
 })
 ```
 
-#### 给测试用例增加Label
+### 给测试用例增加Label
 
 ```go
 Describe("Storing books", Label("integration", "storage"), func() {
@@ -1041,7 +1041,7 @@ Describe("Storing books", Label("integration", "storage"), func() {
 - `ginkgo --label-filter=/library/` 运行所有匹配`library`模式的用例
 
 
-#### 按照文件filter
+### 按照文件filter
 
 - `ginkgo --focus-file=foo` 匹配foo_test.go 和 /foo/bar_test.go
 - `ginkgo --skip-file=foo` 匹配foo_test.go 和 /foo/bar_test.go

@@ -1,6 +1,6 @@
-## go test 命令
+# go test 命令
 
-## `go help test`
+# `go help test`
 
 `go test` 会自动运行引入的包。并产生如下的summary信息：
 
@@ -39,7 +39,7 @@ cache的策略时：
 - o : 编译二进制到指定文件内；
 
 
-## `go help testflag`
+# `go help testflag`
 
 这部分flag同时也可以作用于`go test`命令。其中部分flag可以输出用于`go tool pprof`的文件。
 

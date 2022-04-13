@@ -1,12 +1,15 @@
-## 第7章 测试
+# 第7章 测试
 
-### 其他资料
+## 其他资料
 
 [BDD & ginkgo](/ch7/BDD&Ginkgo.md)
+
 [gorm & sqlmock](/ch7/SQLMock.md)
+
 [go test 命令与参数](/ch7/GoTest.md)
 
-### 7.1 单元测试
+
+## 7.1 单元测试
 
 golang中测试做的比较好的点在于定义了什么是一个单元。golang的一个包就是一个单元，对应于代码树中的一个文件夹。编译器将每个包编译成为一个独立的二进制文件，已完成单元测试。
 
@@ -84,7 +87,7 @@ func TestDownload(t *testing.T) {
 } }
 ```
 
-### 7.2 Table单元测试
+## 7.2 Table单元测试
 
 很多单元测试，有很多分支，可以将多个分支组成一个表，每一行都是：输入，期望结果。这样可以复用一段代码，完成所有case的测试。
 
@@ -118,7 +121,7 @@ func TestDownload(t *testing.T) {
 }
 ```
 
-### 7.3 Mock Web调用
+## 7.3 Mock Web调用
 
 ```go
 package sample_test
@@ -236,7 +239,7 @@ func TestDownload(t *testing.T) {
 
 ```
 
-### 7.4 Web内部处理节点
+## 7.4 Web内部处理节点
 
 如下所示的代码
 
@@ -316,7 +319,7 @@ func TestSendJSON(t *testing.T) {
 ```
 
 
-### 7.5 子测试
+## 7.5 子测试
 
 虽然我们已经有了Table测试，但是在同一个Table中的多个测试用例，是比较难以区分的，Table中的每一行是否可以成为一个单独的测试用例呢？
 

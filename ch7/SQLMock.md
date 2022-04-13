@@ -1,4 +1,4 @@
-## mock SQL
+# mock SQL
 
 很多时候我们系统依赖于各种MySQL等DB，此时如果想测试系统就需要
 - 每个想要跑测试用例的同学都有一套可以完全运行应用的测试环境；
@@ -38,7 +38,7 @@
 ```
 
 
-### 增加对象
+## 增加对象
 
 ```go
 ginkgo.Describe("save books to database", func() { //测试存储数据到db
@@ -79,7 +79,7 @@ ginkgo.Describe("save books to database", func() { //测试存储数据到db
 	})
 ```
 
-### 查询数据
+## 查询数据
 
 ```go
 ginkgo.Describe("get books from database", func() {
@@ -124,7 +124,7 @@ ginkgo.Describe("get books from database", func() {
 
 ```
 
-### 删除数据
+## 删除数据
 
 ```go
 ginkgo.Describe("delete books to database", func() {
@@ -158,6 +158,8 @@ ginkgo.Describe("delete books to database", func() {
 		})
 	})
 ```
+
+## 更新对象
 
 ```go
 ginkgo.Describe("update books to database", func() {
