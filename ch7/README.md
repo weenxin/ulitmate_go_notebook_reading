@@ -3,6 +3,8 @@
 ### 其他资料
 
 [BDD & ginkgo](/ch7/BDD&Ginkgo.md)
+[gorm & sqlmock](/ch7/SQLMock.md)
+[go test 命令与参数](/ch7/GoTest.md)
 
 ### 7.1 单元测试
 
