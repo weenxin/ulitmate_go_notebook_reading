@@ -7,7 +7,7 @@
 基准测试不靠谱！于此同时，在我们没有做基准测试前，这些都是我们的猜测。golang的一个优点就是你不需要对任何事情做猜测。
 
 golang的标准库中，已对基准测试做了很好的支持。要想开始基准测试，你需要：
-- 新建一个`*_tets.go`文件
+- 新建一个`*_test.go`文件
 - 新建benchmark函数，函数以`Benchmark`开头，紧跟着测试名称，**测试名称的第一个字母应该是大写的**，函数接收一个`*testing.B`对象。
 
 如下所示的代码，开启了两个基准测试函数，分别用来测试上传和下载的效率。
@@ -335,7 +335,7 @@ func Unlimited(n []int) []int {
 	}()
 	wg.Wait()
 
-	return merge(Unlimited(l), Unlimited(r))
+	return merge(l, r)
 }
 ```
 
