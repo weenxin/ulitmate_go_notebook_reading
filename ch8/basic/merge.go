@@ -55,7 +55,7 @@ func Unlimited(n []int) []int {
 	}()
 	wg.Wait()
 
-	return merge(Unlimited(l), Unlimited(r))
+	return merge(l, r)
 }
 
 func NumCpu(n []int) []int {
