@@ -105,7 +105,7 @@ func TestNumCpu(t *testing.T) {
 var n []int
 
 func init() {
-	for i := 0; i < 1_000; i++ {
+	for i := 0; i < 1_000_000; i++ {
 		n = append(n, 1000-i)
 	}
 }
