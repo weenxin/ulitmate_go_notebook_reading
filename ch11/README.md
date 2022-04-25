@@ -7,7 +7,7 @@
 
 调优使用的样例代码如下所示：
 
-![server.png](/ch11/images/server.png)
+![server.png](/ch11/images/server.svg)
 
 如上图所示：
 
