@@ -211,7 +211,7 @@ func BenchmarkAlgorithmTwo(b *testing.B) {
 
 结果如下所示：
 
-`
+```
 goos: darwin
 goarch: amd64
 pkg: github.com/weenxin/ulitmate_go_notebook_reading/ch10
@@ -220,7 +220,7 @@ BenchmarkAlgorithmOne-4          1784953              2292 ns/op              53
 BenchmarkAlgorithmTwo-4          6776229               474.9 ns/op             0 B/op          0 allocs/op
 PASS
 ok      github.com/weenxin/ulitmate_go_notebook_reading/ch10    13.598s
-`
+```
 
 ## 10.4 内存分析
 
@@ -228,7 +228,7 @@ ok      github.com/weenxin/ulitmate_go_notebook_reading/ch10    13.598s
 
 会产生两个文件：`p.out` 和 `ch10.test`
 
-`
+```
 -rw-r--r--   1 weenxin  staff   188B Apr 19 17:55 README.md
 drwxr-xr-x   5 weenxin  staff   160B Apr 21 16:44 ch10/
 -rwxr-xr-x   1 weenxin  staff   2.9M Apr 21 16:44 ch10.test*
@@ -240,7 +240,7 @@ drwxr-xr-x  13 weenxin  staff   416B Apr 19 18:07 ch9/
 -rw-r--r--   1 weenxin  staff   1.6K Apr 20 15:24 go.mod
 -rw-r--r--   1 weenxin  staff    15K Apr 20 15:24 go.sum
 -rw-r--r--   1 weenxin  staff   1.1K Apr 21 16:45 p.out //产
-`
+```
 
 - `p.out` : 是产生的profile文件；
 - `ch10.test` : 运行benchmark的二进制文件。
