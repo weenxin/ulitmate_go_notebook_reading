@@ -224,7 +224,7 @@ ok      github.com/weenxin/ulitmate_go_notebook_reading/ch10    13.598s
 
 ## 10.4 内存分析
 
-执行 ：  `go test -bench . -benchtime 3s -benchmem -memprofile p.out`
+执行 ：  `go test -bench BenchmarkAlgorith  -benchtime 3s -benchmem -memprofile p.out ./ch10/...`
 
 会产生两个文件：`p.out` 和 `ch10.test`
 
