@@ -50,10 +50,10 @@ func main() {
 	}
 
 	topic := "president"
-	n := freq(topic, docs)
+	//n := freq(topic, docs)
 	//n := freqConcurrent(topic, docs)
 	// n := freqConcurrentSem(topic, docs)
-	//n := freqProcessors(topic, docs)
+	n := freqProcessors(topic, docs)
 	// n := freqProcessorsTasks(topic, docs)
 	// n := freqActor(topic, docs)
 
@@ -107,11 +107,11 @@ func freqConcurrent(topic string, docs []string) int {
 
 	for _, doc := range docs {
 		go func(doc string) {
-			//var lFound int32  //版本3
-			//defer func() {
-			//	atomic.AddInt32(&found, lFound) //版本3
-			//	wg.Done()
-			//}()
+			var lFound int32  //版本3
+			defer func() {
+				atomic.AddInt32(&found, lFound) //版本3
+				wg.Done()
+			}()
 
 			file := fmt.Sprintf("%s.xml", doc[:8])
 			f, err := os.OpenFile(file, os.O_RDONLY, 0)
@@ -135,16 +135,16 @@ func freqConcurrent(topic string, docs []string) int {
 
 			for _, item := range d.Channel.Items {
 				if strings.Contains(item.Title, topic) {
-					found++ // 第一个版本
+					//found++ // 第一个版本
 					//atomic.AddInt32(&found,1) //第二个版本，解决并发问题
-					//lFound ++  //版本3
+					lFound ++  //版本3
 					continue
 				}
 
 				if strings.Contains(item.Description, topic) {
-					found++ // 第一个版本
+					//found++ // 第一个版本
 					//atomic.AddInt32(&found,1) //第二个版本解决并发问题
-					//lFound ++  //版本3
+					lFound ++  //版本3
 				}
 			}
 
@@ -230,35 +230,35 @@ func freqProcessors(topic string, docs []string) int {
 			}()
 
 			for doc := range ch {
-				//ctx, task := trace.NewTask(context.Background(),doc) // 增加Task
+				ctx, task := trace.NewTask(context.Background(),doc) // 增加Task
 
-				//reg := trace.StartRegion(ctx, "OpenFile") // 增加Region
+				reg := trace.StartRegion(ctx, "OpenFile") // 增加Region
 				file := fmt.Sprintf("%s.xml", doc[:8])
 				f, err := os.OpenFile(file, os.O_RDONLY, 0)
 				if err != nil {
 					log.Printf("Opening Document [%s] : ERROR : %v", doc, err)
 					return
 				}
-				//reg.End() // 结束Region
+				reg.End() // 结束Region
 
-				//reg = trace.StartRegion(ctx, "ReadAll") // 增加Region
+				reg = trace.StartRegion(ctx, "ReadAll") // 增加Region
 				data, err := io.ReadAll(f)
 				f.Close()
 				if err != nil {
 					log.Printf("Reading Document [%s] : ERROR : %v", doc, err)
 					return
 				}
-				//reg.End() // 结束Region
+				reg.End() // 结束Region
 
-				//reg = trace.StartRegion(ctx, "Unmarshal") // 增加Region
+				reg = trace.StartRegion(ctx, "Unmarshal") // 增加Region
 				var d document
 				if err := xml.Unmarshal(data, &d); err != nil {
 					log.Printf("Decoding Document [%s] : ERROR : %v", doc, err)
 					return
 				}
-				//reg.End() // 结束Region
+				reg.End() // 结束Region
 
-				//reg = trace.StartRegion(ctx, "Contains") // 增加Region
+				reg = trace.StartRegion(ctx, "Contains") // 增加Region
 				for _, item := range d.Channel.Items {
 					if strings.Contains(item.Title, topic) {
 						lFound++
@@ -269,8 +269,8 @@ func freqProcessors(topic string, docs []string) int {
 						lFound++
 					}
 				}
-				//reg.End()// 结束Region
-				//task.End() // 结束Task
+				reg.End()// 结束Region
+				task.End() // 结束Task
 			}
 		}()
 	}
@@ -278,6 +278,7 @@ func freqProcessors(topic string, docs []string) int {
 	for _, doc := range docs {
 		ch <- doc
 	}
+
 	close(ch)
 
 	wg.Wait()

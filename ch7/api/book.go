@@ -9,7 +9,7 @@ import (
 )
 
 func getBook(ctx *gin.Context) {
-	bookId, err := cast.ToInt64E(ctx.Param("book_id"))
+	bookId, err := cast.ToUintE(ctx.Param("book_id"))
 	if err != nil {
 		makeResponse(ctx, http.StatusBadRequest, "failed", "invalid book id", nil)
 		return

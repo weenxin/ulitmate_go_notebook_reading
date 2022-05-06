@@ -57,11 +57,11 @@ func algOne(data []byte, find []byte, repl []byte, output *bytes.Buffer) {
 
 		if equal(buf, find) { //3 占用时间比较多，因此可以优化下
 		//if bytes.Equal(buf, find) { //3 转换成为一个string，会有一次cop，性能降低
-		//	output.Write(repl)
-		//	if _, err := io.ReadFull(input, buf[end:]); err != nil { //当作io.Reader来用，input会逃逸
-		//		output.Write(buf[:end])
-		//		return
-		//	}
+			output.Write(repl)
+			//if _, err := io.ReadFull(input, buf[end:]); err != nil { //当作io.Reader来用，input会逃逸
+			//	output.Write(buf[:end])
+			//	return
+			//}
 
 			data, err := input.ReadByte() //　调用方法，没有隐式转换
 			buf[end:][0] = data

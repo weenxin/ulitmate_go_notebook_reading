@@ -3,6 +3,7 @@ package model
 import (
 	"encoding/json"
 	"fmt"
+	"gorm.io/gorm"
 	"os"
 	"strings"
 )
@@ -21,7 +22,8 @@ const MaxShortStoryPages = 300
 
 //Book 是测试用例
 type Book struct {
-	Id     int64  `json:"id,omitempty"`
+	gorm.Model
+	//Id     int64  `json:"id,omitempty"`
 	Title  string `json:"title,omitempty" json:"title,omitempty"`
 	Author string `json:"author,omitempty" json:"author,omitempty"`
 	Pages  int32  `json:"pages" json:"pages,omitempty"`

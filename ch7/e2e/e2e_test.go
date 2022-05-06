@@ -7,6 +7,7 @@ import (
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
 	"github.com/weenxin/ulitmate_go_notebook_reading/ch7/model"
+	"gorm.io/gorm"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -17,7 +18,7 @@ var _ = ginkgo.Describe("Api", func() {
 		var b *model.Book
 		ginkgo.BeforeEach(func() {
 			b = &model.Book{
-				Id:     0,
+				Model:gorm.Model{ID: 0},
 				Title:  "test title",
 				Author: "test author",
 				Pages:  100,
@@ -44,14 +45,14 @@ var _ = ginkgo.Describe("Api", func() {
 			}{}
 			err = json.Unmarshal(content, &bookInserted)
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-			gomega.Expect(bookInserted.Data.Id).NotTo(gomega.Equal(0))
+			gomega.Expect(bookInserted.Data.ID).NotTo(gomega.Equal(0))
 			gomega.Expect(b.Title).To(gomega.Equal(bookInserted.Data.Title))
 			gomega.Expect(b.Author).To(gomega.Equal(bookInserted.Data.Author))
 			gomega.Expect(b.Pages).To(gomega.Equal(bookInserted.Data.Pages))
 			gomega.Expect(b.Weight).To(gomega.Equal(bookInserted.Data.Weight))
 
 			ginkgo.By("get book")
-			url := fmt.Sprintf("http://%s/books/%d", address, bookInserted.Data.Id)
+			url := fmt.Sprintf("http://%s/books/%d", address, bookInserted.Data.ID)
 			resp, err := http.Get(url)
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 			defer func(Body io.ReadCloser) {
@@ -69,7 +70,7 @@ var _ = ginkgo.Describe("Api", func() {
 			}{}
 			err = json.Unmarshal(content, &data)
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-			gomega.Expect(bookInserted.Data.Id).To(gomega.Equal(data.Data.Id))
+			gomega.Expect(bookInserted.Data.ID).To(gomega.Equal(data.Data.ID))
 			gomega.Expect(b.Title).To(gomega.Equal(data.Data.Title))
 			gomega.Expect(b.Author).To(gomega.Equal(data.Data.Author))
 			gomega.Expect(b.Pages).To(gomega.Equal(data.Data.Pages))
